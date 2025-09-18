@@ -59,3 +59,4 @@ lerna-debug.log*
 *.sln
 *.sw?
 server/values.rar
+/AGENTS.md
