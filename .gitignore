@@ -58,3 +58,4 @@ lerna-debug.log*
 *.njsproj
 *.sln
 *.sw?
+server/values.rar
