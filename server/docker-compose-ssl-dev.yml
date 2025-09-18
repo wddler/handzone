@@ -1,3 +1,4 @@
+name: handzone
 version: "3.9"
 services:
   db:
@@ -53,7 +54,7 @@ services:
     env_file:
       - .env
     restart: always
-    container_name: handzone-server-dev
+    container_name: handzone-dev
     environment:
       VIRTUAL_HOST: ${HOSTNAME}
       DATABASE_URL: "postgresql://${DATABASE_USER}:${DATABASE_PASSWORD}@db/handzone?schema=public"
@@ -67,6 +68,14 @@ services:
     depends_on:
       - db
       - docker
+
+    # Ensure DB schema exists before starting dev server
+    command: >-
+      sh -c "
+      (npx prisma generate || true) &&
+      until npx prisma migrate deploy; do echo 'Waiting for database...'; sleep 2; done &&
+      ./node_modules/.bin/tsx src/server/index.ts
+      "
 
 networks:
   default:

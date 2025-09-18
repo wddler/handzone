@@ -61,18 +61,23 @@ export const oauthCallback = async (req: Request, res: Response) => {
 			const session = await lucia.createSession(existingUser.id, {})
 			const sessionCookie = lucia.createSessionCookie(session.id)
 			res.appendHeader('Set-Cookie', serializeCookie(sessionCookie.name, sessionCookie.value, sessionCookie.attributes))
-		} else {
-			// get the user info
-			const user = await getUserInfo(tokens.access_token)
+        } else {
+            // get the user info
+            const user = await getUserInfo(tokens.access_token)
 
-			// create the user
-			await prisma.user.create({
-				data: {
-					id: user.id,
-					email: user.email,
-					name: user.name,
-				}
-			})
+            // create the user
+            const allowlist = new Set((env.ADMIN_EMAILS ?? '')
+                .split(',')
+                .map(s => s.trim().toLowerCase())
+                .filter(Boolean))
+            await prisma.user.create({
+                data: {
+                    id: user.id,
+                    email: user.email,
+                    name: user.name,
+                    admin: user.email ? allowlist.has(user.email.toLowerCase()) : false,
+                }
+            })
 
 			const session = await lucia.createSession(user.id, {})
 			const sessionCookie = lucia.createSessionCookie(session.id)

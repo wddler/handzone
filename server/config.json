@@ -3,8 +3,8 @@
 		{
 			"name": "robot-1",
 			"port": 30003,
-			"vnc": 5999,
-			"address": "172.19.14.251",
+			"vnc": 5900,
+			"address": "ursim",
 			"camera": [
 				{
 					"name": "Static",
@@ -15,10 +15,10 @@
 	],
 	"DOCKER": {
 		"OPTIONS": {
-			"host": "172.19.14.251",
-			"port": 2375
+			"socketPath": "/var/run/docker.sock"
 		},
-		"MAX_VIRTUAL": 5
+		"MAX_VIRTUAL": 5,
+		"NOTE": "To use the TCP proxy instead of the Unix socket, set DOCKER.OPTIONS to { \"host\": \"docker\", \"port\": 2375 } when the proxy runs in the same compose stack/network, or to { \"host\": \"localhost\", \"port\": 2375 } when running the server on the host while the proxy is mapped to 2375 on localhost."
 	},
 	"OAUTH": {
 		"name": "SURFconext",

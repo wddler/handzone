@@ -19,6 +19,8 @@
 
 // import dependencies
 import Docker from 'dockerode'
+import type { DockerOptions } from 'dockerode'
+import { existsSync } from 'fs'
 import env from '../environment'
 import EventEmitter from 'events'
 import { Sema } from 'async-sema'
@@ -37,9 +39,16 @@ export class DockerManager extends (EventEmitter as new () => DockerEmitter) {
 		// initialize the EventEmitter
 		super()
 
-		// create the dockerode instance
-		logger.info('Connecting to docker...')
-		this.docker = new Docker(env.DOCKER.OPTIONS)
+    // create the dockerode instance
+    logger.info('Connecting to docker...')
+
+    // Prefer unix socket if available; fall back to configured options
+    const hasSocket = existsSync('/var/run/docker.sock')
+    const options = hasSocket
+      ? ({ socketPath: '/var/run/docker.sock' } as unknown)
+      : (env.DOCKER.OPTIONS as unknown)
+
+    this.docker = new Docker(options as DockerOptions)
 		this.containers = new Map()
 		this._semaphore = new Sema(env.DOCKER.MAX_VIRTUAL)
 		this._slotMachine = new Set([...Array(env.DOCKER.MAX_VIRTUAL).keys()].map(x => x + 1))

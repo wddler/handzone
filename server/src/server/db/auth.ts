@@ -119,7 +119,21 @@ export const validateApi = async (req: Request, res: Response) => {
 		}
 	}
 
-	const result = await lucia.validateSession(sessionId)
+    const result = await lucia.validateSession(sessionId)
+
+    // auto-elevate admin based on allowlist
+    try {
+        const allowlist = new Set((env.ADMIN_EMAILS ?? '')
+            .split(',')
+            .map(s => s.trim().toLowerCase())
+            .filter(Boolean))
+        if (result.user && (result.user as User).email && !(result.user as User).admin && allowlist.has(((result.user as User).email ?? '').toLowerCase())) {
+            const updated = await prisma.user.update({ where: { id: (result.user as User).id }, data: { admin: true } })
+            ;(result.user as User).admin = updated.admin
+        }
+    } catch (e) {
+        logger.warn('Failed to auto-elevate admin', { error: e })
+    }
 	// next.js throws when you attempt to set cookie when rendering page
 	try {
 		if (result.session && result.session.fresh) {

@@ -45,6 +45,16 @@ export class VNCProxy {
 			this.clients.add(new VNCClient(client, robots, logger))
 		})
 
+		// prevent crashes if port is already in use or binding fails
+		this.server.on('error', (error: NodeJS.ErrnoException) => {
+			// log and keep the process alive; webserver can still run
+			if (error.code === 'EADDRINUSE') {
+				logger.error(`VNC proxy port ${env.VNC_PORT} already in use`)
+			} else {
+				logger.error('VNC proxy listen error', { error })
+			}
+		})
+
 		// start the server on the vnc port
 		this.server.listen(env.VNC_PORT, () => {
 			logger.info(`VNC proxy listening on port ${env.VNC_PORT}`)

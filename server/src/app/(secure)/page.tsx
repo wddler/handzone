@@ -15,6 +15,7 @@
  */
 
 // import dependencies
+import { redirect } from "next/navigation"
 import { validateRequest } from "@/server/db/auth-next"
 
 // import components
@@ -30,18 +31,23 @@ export default async function Page() {
     // get the user
     const { user } = await validateRequest()
 
+    // if somehow unauthenticated reaches here (dev edge cases), redirect
+    if (!user) {
+        return redirect("/about")
+    }
+
     return (
         <main className="container mx-auto flex grow flex-col items-center gap-8 overflow-y-auto p-8">
-            {user!.admin && (
+            {user.admin && (
                 <div className="w-full rounded border border-300 bg-white shadow-md">
                     <TeacherRobotMonitoringDashboard />
                 </div>
             )}
             <div className="flex w-full flex-col gap-8 lg:flex-row">
                 <div className="aspect-square basis-full divide-y divide-300 rounded border border-300 bg-white shadow-md lg:basis-1/3">
-                    {user!.admin ? <TeacherCalendar /> : <StudentCalendar />}
+                    {user.admin ? <TeacherCalendar /> : <StudentCalendar />}
                 </div>
-                {user!.admin ? (
+                {user.admin ? (
                     <div className="flex basis-full flex-col gap-8 lg:basis-2/3">
                         <div className="grow divide-y divide-300 rounded border border-300 bg-white shadow-md">
                             <TeacherRequestDashboard />
@@ -52,7 +58,7 @@ export default async function Page() {
                     </div>
                 ) : (
                     <div className="basis-full divide-y divide-300 rounded border border-300 bg-white shadow-md lg:basis-2/3">
-                        <StudentRequestDashboard user={user!} />
+                        <StudentRequestDashboard user={user} />
                     </div>
                 )}
             </div>

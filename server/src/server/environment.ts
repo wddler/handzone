@@ -43,6 +43,9 @@ const envSchema = {
 
 	OAUTH_CLIENT_ID: z.string(),
 	OAUTH_CLIENT_SECRET: z.string(),
+
+	/** Comma-separated list of admin emails to auto-elevate on login */
+	ADMIN_EMAILS: z.string().optional().default(''),
 }
 
 // create config schema

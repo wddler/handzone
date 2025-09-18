@@ -1,4 +1,4 @@
-version: "3.9"
+name: handzone
 services:
   db:
     image: postgres:16.2
@@ -24,7 +24,7 @@ services:
       - "3000:3000"
       - "4000:4000"
       - "5900:5900"
-    container_name: handzone-server-dev
+    container_name: handzone-dev
     environment:
       VIRTUAL_HOST: ${HOSTNAME}
       DATABASE_URL: "postgresql://${DATABASE_USER}:${DATABASE_PASSWORD}@db/handzone?schema=public"
@@ -32,11 +32,23 @@ services:
       - type: bind
         source: ./
         target: /app
+      # Use container-managed volumes to avoid host permission issues and speed up rebuilds
+      - /app/node_modules
+      - /app/.next
+      - /app/logs
       - type: bind
         source: /var/run/docker.sock
         target: /var/run/docker.sock
     depends_on:
       - db
+
+    # Ensure DB schema exists before starting dev server
+    command: >-
+      sh -c "
+      (npx prisma generate || true) &&
+      until npx prisma migrate deploy; do echo 'Waiting for database...'; sleep 2; done &&
+      ./node_modules/.bin/tsx src/server/index.ts
+      "
 
 networks:
   default:

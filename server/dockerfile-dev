@@ -1,6 +1,18 @@
 ##### DEPENDENCIES
 FROM node:20-alpine3.18
-RUN apk update && apk add ffmpeg
+
+# system dependencies for Next.js (SWC) and Prisma engines
+RUN apk update \
+ && apk add --no-cache \
+    ffmpeg \
+    openssl \
+    libc6-compat
+
 WORKDIR /app
 
+# Install dependencies early for faster start (will be used with node_modules volume)
+COPY package*.json ./
+RUN npm ci --include=dev || npm install
+
+# Default command runs the dev server (installs if needed via package script)
 CMD ["npm", "run", "dev"]
