@@ -116,6 +116,7 @@ MonoBehaviour:
   m_colorSubmissionModes:
     m_List: 00000000
   m_depthSubmissionMode: 0
+  m_spacewarpMotionVectorTextureFormat: 0
   m_optimizeBufferDiscards: 0
   m_symmetricProjection: 0
 --- !u!114 &-7716480481011822612
@@ -151,6 +152,9 @@ MonoBehaviour:
   - visibleName: Quest 3
     manifestName: eureka
     enabled: 1
+  - visibleName: Quest 3S
+    manifestName: quest3s
+    enabled: 1
   forceRemoveInternetPermission: 1
   symmetricProjection: 0
   foveatedRenderingApi: 0
@@ -158,6 +162,8 @@ MonoBehaviour:
   optimizeBufferDiscards: 1
   lateLatchingMode: 0
   lateLatchingDebug: 0
+  optimizeMultiviewRenderRegions: 0
+  spacewarpMotionVectorTextureFormat: 0
 --- !u!114 &-7680162970974977367
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -336,6 +342,7 @@ MonoBehaviour:
   m_colorSubmissionModes:
     m_List: 00000000
   m_depthSubmissionMode: 0
+  m_spacewarpMotionVectorTextureFormat: 0
   m_optimizeBufferDiscards: 0
   m_symmetricProjection: 0
 --- !u!114 &-5608382823279327293
@@ -872,6 +879,7 @@ MonoBehaviour:
   m_colorSubmissionModes:
     m_List: 00000000
   m_depthSubmissionMode: 0
+  m_spacewarpMotionVectorTextureFormat: 0
   m_optimizeBufferDiscards: 0
   m_symmetricProjection: 0
 --- !u!114 &1657058217166411807
@@ -1182,6 +1190,7 @@ MonoBehaviour:
   m_colorSubmissionModes:
     m_List: 00000000
   m_depthSubmissionMode: 0
+  m_spacewarpMotionVectorTextureFormat: 0
   m_optimizeBufferDiscards: 0
   m_symmetricProjection: 0
 --- !u!114 &5870849222703451629

@@ -1500,6 +1500,12 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8a749df5e56f6422ba9fe64d83915a89, type: 3}
+--- !u!1 &1205471873 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6146946163571681050, guid: 58d448b067a248e4a83fdbd3d7b2cdaf,
+    type: 3}
+  m_PrefabInstance: {fileID: 1597386713}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1244162845
 GameObject:
   m_ObjectHideFlags: 0
@@ -1684,7 +1690,7 @@ PlayableDirector:
   m_GameObject: {fileID: 1284715680}
   m_Enabled: 1
   serializedVersion: 3
-  m_PlayableAsset: {fileID: 11400000, guid: 96d3255e4202d1a4d83cf9ca60a917fe, type: 2}
+  m_PlayableAsset: {fileID: 11400000, guid: ad7cb55b2d9de1a4d81b0f614e16b7dd, type: 2}
   m_InitialState: 0
   m_WrapMode: 2
   m_DirectorUpdateMode: 0
@@ -1736,6 +1742,8 @@ PlayableDirector:
     value: {fileID: 273414352}
   - key: {fileID: 280500066849124924, guid: 6792d067548f5e2488e0086e17a627d4, type: 2}
     value: {fileID: 332066211}
+  - key: {fileID: -3685019610529463822, guid: ad7cb55b2d9de1a4d81b0f614e16b7dd, type: 2}
+    value: {fileID: 1597386716}
   m_ExposedReferences:
     m_References:
     - 11a8d743ebcd3a74685beb57c24259b6: {fileID: 2111913922}
@@ -2236,10 +2244,12 @@ MonoBehaviour:
     - 83822afd72543944cabf6238763f4f81
     - 568eda67f9603c645b522cbf5c928a4b
     - bf98f1db0969fa94db8b67916fe73d17
+    - 0c66d03a484a05a49923db28af722e57
     m_Values:
     - {fileID: 0}
     - {fileID: 0}
     - {fileID: 0}
+    - {fileID: 1205471873}
 --- !u!4 &1646273892
 Transform:
   m_ObjectHideFlags: 1
@@ -2993,6 +3003,12 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 5927207793520211862, guid: c348712bda248c246b8c49b3db54643f,
         type: 3}
+    - target: {fileID: 1833736096786321441, guid: aef0bf9a9fa69c84e81b9eb336c9fd3a,
+        type: 3}
+      propertyPath: currentSelectedSection
+      value: 
+      objectReference: {fileID: 11400000, guid: bb360ec5d25dba046b0e066e4b605a7f,
+        type: 2}
     - target: {fileID: 2715267619782839167, guid: aef0bf9a9fa69c84e81b9eb336c9fd3a,
         type: 3}
       propertyPath: m_Name
@@ -3267,10 +3283,13 @@ MonoBehaviour:
   m_RepeatRate: 0.1
   m_TrackedDeviceDragThresholdMultiplier: 2
   m_TrackedScrollDeltaMultiplier: 5
+  m_BypassUIToolkitEvents: 0
   m_ActiveInputMode: 1
   m_EnableXRInput: 1
   m_EnableMouseInput: 1
   m_EnableTouchInput: 1
+  m_EnableGamepadInput: 1
+  m_EnableJoystickInput: 1
   m_PointAction: {fileID: 2869410428622933342, guid: c348712bda248c246b8c49b3db54643f,
     type: 3}
   m_LeftClickAction: {fileID: 1855836014308820768, guid: c348712bda248c246b8c49b3db54643f,
@@ -3288,8 +3307,6 @@ MonoBehaviour:
   m_CancelAction: {fileID: 2387711382375263438, guid: c348712bda248c246b8c49b3db54643f,
     type: 3}
   m_EnableBuiltinActionsAsFallback: 1
-  m_EnableGamepadInput: 1
-  m_EnableJoystickInput: 1
   m_HorizontalAxis: Horizontal
   m_VerticalAxis: Vertical
   m_SubmitButton: Submit
