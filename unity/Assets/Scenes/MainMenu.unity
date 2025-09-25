@@ -153,7 +153,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isConnected: 0
-  host: 172.19.14.251
+  host: localhost
   port: 3000
   scheme: http
 --- !u!4 &19092647
