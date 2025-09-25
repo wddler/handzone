@@ -61,6 +61,7 @@ https://github.com/user-attachments/assets/c3ff9a0e-e38f-41bb-8241-057fa040d8e5
 
 ## Prerequisites
 Before you begin, ensure you have met the following requirements:
+- **[Git](https://git-scm.com/downloads)**: Required to clone the repository.
 - **[Docker](https://www.docker.com/)**: For containerized deployment.
 - **[Unity Editor (2022.3 or later)](https://unity.com/download)**: For running the VR application.
 - **[Rhino 7 / Grasshopper](https://www.rhino3d.com/download/)**: For running the Grasshopper plugin.

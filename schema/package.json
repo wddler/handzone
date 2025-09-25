@@ -5,7 +5,8 @@
   "main": "dist/generate.js",
   "bin": "dist/generate.js",
   "scripts": {
-    "generate": "ts-node generate.ts"
+    "generate": "ts-node generate.ts",
+    "generate:unity": "ts-node generate.ts --out-cs unity/com.handzone.schema/Runtime"
   },
   "author": "",
   "license": "ISC",

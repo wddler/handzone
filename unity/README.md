@@ -16,6 +16,7 @@ This application features a digital twin of a robotic arm, providing users with 
 
 ## Prerequisites
 
+- **[Git](https://git-scm.com/downloads)**: Required to clone this repository.
 - **[Unity Editor (2022.3 or later)](https://unity.com/download)**: For running the VR application.
 - **[HANDZONe Server](../server/README.md)** to manage robots and devices to digital twin inside the VR application.
 - **[HANDZONe Grasshopper plugin](../grasshopper/README.md)** when connecting Grasshopper to Unity.
