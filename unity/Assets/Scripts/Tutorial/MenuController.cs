@@ -59,8 +59,10 @@ public class MenuController : MonoBehaviour
 
     private MenuName _previousMenu;
     private MenuName _currentMenu;
+    private readonly Stack<MenuName> _menuHistory = new();
     private Dictionary<MenuName, GameObject> _menuDictionary = new();
     private bool _isMenuOpen = false;
+    private bool _initialized = false;
 
     public Action<SectionData> OnSectionSelected;
     public Action<ChapterData> OnChapterSelected;
@@ -152,9 +154,34 @@ public class MenuController : MonoBehaviour
     /// <param name="menuName">The name of the menu to switch to.</param>
     public void ChangeMenu(MenuName menuName)
     {
-        _previousMenu = _currentMenu;
+        ChangeMenu(menuName, true);
+    }
+
+    /// <summary>
+    /// Changes the current menu to the specified menu name.
+    /// </summary>
+    /// <param name="menuName">The name of the menu to switch to.</param>
+    /// <param name="recordHistory">If true, push the current menu onto the back-stack.</param>
+    public void ChangeMenu(MenuName menuName, bool recordHistory)
+    {
+        if (!_initialized)
+        {
+            _currentMenu = menuName;
+            _initialized = true;
+        }
+        else if (recordHistory && menuName != _currentMenu)
+        {
+            _menuHistory.Push(_currentMenu);
+        }
+
+        _previousMenu = _menuHistory.Count > 0 ? _menuHistory.Peek() : _currentMenu;
         _currentMenu = menuName;
-        foreach (var menu in _menuDictionary) menu.Value.SetActive(menu.Key == _currentMenu);
+
+        foreach (var menu in _menuDictionary)
+        {
+            menu.Value.SetActive(menu.Key == _currentMenu);
+        }
+
         _isMenuOpen = true;
     }
 
@@ -163,7 +190,13 @@ public class MenuController : MonoBehaviour
     /// </summary>
     public void GoBack()
     {
-        ChangeMenu(_previousMenu);
+        if (_menuHistory.Count == 0)
+        {
+            return;
+        }
+
+        var target = _menuHistory.Pop();
+        ChangeMenu(target, false);
     }
 
     /// <summary>
@@ -203,7 +236,10 @@ public class MenuController : MonoBehaviour
     public void HideMenu()
     {
         _previousMenu = _currentMenu;
-        foreach (var menu in _menuDictionary) menu.Value.SetActive(false);
+        foreach (var menu in _menuDictionary)
+        {
+            menu.Value.SetActive(false);
+        }
         _isMenuOpen = false;
     }
 
@@ -212,7 +248,7 @@ public class MenuController : MonoBehaviour
     /// </summary>
     public void ShowMenu()
     {
-        ChangeMenu(_previousMenu);
+        ChangeMenu(_previousMenu, false);
     }
 
     public void ToggleMenu()
