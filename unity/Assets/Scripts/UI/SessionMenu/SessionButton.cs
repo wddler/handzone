@@ -61,7 +61,9 @@ public class SessionButton : MonoBehaviour
     /// <param name="session">The robot session to associate with the button.</param>
     public void SetButton(RobotSession session)
     {
-        _sessionAddress = session.Address;
+        // The server expects to join by session name, not by address.
+        // Store and display the session name here to avoid mismatches.
+        _sessionAddress = session.Name;
 
         // Set button text to session name
         transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = _sessionAddress;
