@@ -67,17 +67,52 @@ export class RobotManager extends (EventEmitter as new () => ManagerEmitter) {
 			throw new Error('Found container without slot label')
 		}
 
-		const port = parseInt(`3${slot}03`)
-		const vnc = parseInt(`59${slot}`)
+		// Virtual robots always expose 30003 internally (the host port mapping varies by slot)
+		// When connecting from within Docker, we use the internal port, not the host-mapped port
+		const port = 30003
+		const vnc = 5900
+
+		// Get the IP address from the container's network settings
+		// When the server runs in Docker, it needs to connect via the container's IP on the shared network
+		let address = env.DOCKER.OPTIONS.host || 'localhost'
+
+		// Extract the network name from the environment or use the default
+		const networkName = env.DOCKER_NETWORK || 'handzone-network'
+
+		// Log the network settings for debugging
+		logger.info(`Container network settings:`, {
+			containerName: container.Name,
+			networks: Object.keys(container.NetworkSettings?.Networks || {}),
+			networkName,
+		})
+
+		// Try to get the IP address from the container's network settings
+		if (container.NetworkSettings?.Networks?.[networkName]?.IPAddress) {
+			address = container.NetworkSettings.Networks[networkName].IPAddress
+			logger.info(`Using container IP address: ${address} from network ${networkName}`)
+		} else {
+			// Check if any network has an IP address
+			const networks = container.NetworkSettings?.Networks || {}
+			const availableNetworks = Object.entries(networks).filter(([_, net]) => net.IPAddress)
+
+			if (availableNetworks.length > 0 && availableNetworks[0]) {
+				const [firstNetwork, networkInfo] = availableNetworks[0]
+				address = networkInfo.IPAddress!
+				logger.info(`Using IP from network ${firstNetwork}: ${address}`)
+			} else {
+				logger.warn(`Could not find IP for network ${networkName}, falling back to ${address}`)
+			}
+		}
 
 		const info: RobotInfo = {
 			name: container.Name.split('/')[1]!,
-			address: env.DOCKER.OPTIONS.host,
+			address,
 			port,
 			vnc,
 			camera: []
 		}
 
+		logger.info(`Virtual robot connection info: ${info.name} at ${address}:${port}`)
 		this._tryCreateRobotConnection(info, virtual)
 		return info
 	}
@@ -99,27 +134,44 @@ export class RobotManager extends (EventEmitter as new () => ManagerEmitter) {
 	}
 
 	/** Starts the TCP Client */
-	_tryCreateRobotConnection(robot: RobotInfo, virtual: SessionType | null = null) {
+	_tryCreateRobotConnection(robot: RobotInfo, virtual: SessionType | null = null, retryCount: number = 0) {
 		// create the logger for the robot
 		const robotLogger = logger.child({ entity: 'robot', robot, label: `ROBOT:${robot.name}` })
 
 		// create the TCP client
 		const socket = new Socket()
 		socket.setTimeout(5000)
-		robotLogger.info(`Connecting to robot...`)
+
+		if (retryCount === 0) {
+			robotLogger.info(`Connecting to robot...`)
+		}
 		socket.connect(robot.port, robot.address)
 
 		let stable: NodeJS.Timeout
 
+		// Handle timeout
+		socket.on('timeout', () => {
+			robotLogger.warn(`Connection timeout, retrying...`)
+			socket.destroy()
+			const delay = virtual ? 5000 : 60000 // 5s for virtual, 60s for real robots
+			setTimeout(() => {
+				this._tryCreateRobotConnection(robot, virtual, retryCount + 1)
+			}, delay)
+		})
+
 		// retry until a connection is established
 		socket.on('error', (error: NodeJS.ErrnoException) => {
 			if (error.code === 'ECONNREFUSED') {
+				socket.destroy() // Clean up the socket before retrying
+				// For virtual robots, retry more frequently (every 5s instead of 60s)
+				const delay = virtual ? 5000 : 60000
+				const retryMsg = retryCount > 0 ? ` (attempt ${retryCount + 1})` : ''
 				return setTimeout(() => {
-					robotLogger.http(`Connection failed, retrying...`)
-					socket.connect(robot.port, robot.address)
-				}, 60000)
+					robotLogger.http(`Connection failed${retryMsg}, retrying...`)
+					this._tryCreateRobotConnection(robot, virtual, retryCount + 1)
+				}, delay)
 			}
-			console.error(error)
+			robotLogger.error('Socket error:', error)
 		})
 
 		// add clients when connected
