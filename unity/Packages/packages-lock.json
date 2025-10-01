@@ -14,7 +14,7 @@
       "dependencies": {
         "com.unity.nuget.newtonsoft-json": "3.2.1"
       },
-      "hash": "2cfc31087d0fdc4a38562b137dd6de02af8ad48c"
+      "hash": "6d7ce30a0fdf9644108e4ceeff325a45a3458537"
     },
     "com.meta.xr.simulator": {
       "version": "78.0.0",

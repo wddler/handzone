@@ -1,7 +1,7 @@
 {
   "dependencies": {
-    "com.handzone.schema": "https://github.com/newmedia-centre/handzone.git?path=schema/unity/com.handzone.schema#main",
     "com.github-glitchenzo.nugetforunity": "https://github.com/GlitchEnzo/NuGetForUnity.git?path=/src/NuGetForUnity",
+    "com.handzone.schema": "https://github.com/newmedia-centre/handzone.git?path=schema/unity/com.handzone.schema#main",
     "com.meta.xr.simulator": "78.0.0",
     "com.unity.2d.sprite": "1.0.0",
     "com.unity.addressables": "1.22.2",
