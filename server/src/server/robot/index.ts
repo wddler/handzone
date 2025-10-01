@@ -90,7 +90,7 @@ export class RobotManager extends (EventEmitter as new () => ManagerEmitter) {
 
 		// Try to get the IP address from the container's network settings
 		if (container.NetworkSettings?.Networks?.[networkName]?.IPAddress) {
-			address = container.NetworkSettings.Networks[networkName].IPAddress
+			address = container.NetworkSettings.Networks[networkName]!.IPAddress
 			logger.info(`Using container IP address: ${address} from network ${networkName}`)
 		} else {
 			// Check if any network has an IP address
