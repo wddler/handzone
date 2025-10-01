@@ -16,7 +16,7 @@ import * as TSJ from 'ts-json-schema-generator'
 function generateUnityMetaFile(filePath: string): string {
 	// Unity uses a GUID based on the file path
 	// We'll generate a consistent GUID from the file path
-	const guid = crypto.createHash('md5').update(filePath).digest('hex').substring(0, 32)
+	const guid = crypto.createHash('md5').update(filePath).digest('hex')
 
 	return `fileFormatVersion: 2
 guid: ${guid}
