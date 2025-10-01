@@ -17,7 +17,7 @@ function generateUnityMetaFile(filePath: string): string {
 	// Unity uses a GUID based on the file path
 	// We'll generate a consistent GUID from the file path
 	const guid = crypto.createHash('md5').update(filePath).digest('hex').substring(0, 32)
-	
+
 	return `fileFormatVersion: 2
 guid: ${guid}
 MonoImporter:
@@ -60,15 +60,15 @@ async function exportCPlusPlus(namespace: string, inputData: InputData) {
 */
 
 async function main() {
-    // optional CLI arg: --out-cs <path>
-    const args = process.argv.slice(2)
-    let outCsRoot: string | null = null
-    for (let i = 0; i < args.length; i++) {
-        if (args[i] === '--out-cs' && args[i + 1]) {
-            outCsRoot = path.resolve(process.cwd(), args[i + 1])
-            i++
-        }
-    }
+	// optional CLI arg: --out-cs <path>
+	const args = process.argv.slice(2)
+	let outCsRoot: string | null = null
+	for (let i = 0; i < args.length; i++) {
+		if (args[i] === '--out-cs' && args[i + 1]) {
+			outCsRoot = path.resolve(process.cwd(), args[i + 1])
+			i++
+		}
+	}
 	// get all the schema files in the project
 	const files = await new Promise<string[]>(resolve => glob(__dirname + '/src/**/*.ts', (_, matches) => resolve(matches)))
 
@@ -89,24 +89,24 @@ async function main() {
 		const inputData = new InputData()
 		inputData.addInput(schemaInput)
 
-        // generate csharp
-        const { lines: csharp } = await exportCSharp(`${namespace}.${name}`, inputData)
-        // default emits next to .ts; if --out-cs is set, mirror folder structure under src/
-        let targetDir = path.dirname(file)
-        if (outCsRoot) {
-            const rel = path.relative(path.join(__dirname, 'src'), path.dirname(file))
-            targetDir = path.join(outCsRoot, rel)
-        }
-        mkdirSync(targetDir, { recursive: true })
-        const csFilePath = path.join(targetDir, `${name}.cs`)
-        writeFileSync(csFilePath, csharp.join('\n'))
-        
-        // Generate Unity .meta file if outputting to Unity package
-        if (outCsRoot) {
-            const metaContent = generateUnityMetaFile(csFilePath)
-            writeFileSync(`${csFilePath}.meta`, metaContent)
-            console.log('  Generated .meta file')
-        }
+		// generate csharp
+		const { lines: csharp } = await exportCSharp(`${namespace}.${name}`, inputData)
+		// default emits next to .ts; if --out-cs is set, mirror folder structure under src/
+		let targetDir = path.dirname(file)
+		if (outCsRoot) {
+			const rel = path.relative(path.join(__dirname, 'src'), path.dirname(file))
+			targetDir = path.join(outCsRoot, rel)
+		}
+		mkdirSync(targetDir, { recursive: true })
+		const csFilePath = path.join(targetDir, `${name}.cs`)
+		writeFileSync(csFilePath, csharp.join('\n'))
+
+		// Generate Unity .meta file if outputting to Unity package
+		if (outCsRoot) {
+			const metaContent = generateUnityMetaFile(csFilePath)
+			writeFileSync(`${csFilePath}.meta`, metaContent)
+			console.log('  Generated .meta file')
+		}
 
 		/*
 		// generate c++

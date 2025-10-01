@@ -1,0 +1,15 @@
+{
+  "name": "com.handzone.schema",
+  "displayName": "Handzone Schema",
+  "version": "0.1.0",
+  "unity": "2022.3",
+  "description": "Generated C# data schemas for Handzone (UPM package).",
+  "keywords": ["schema", "handzone", "quicktype"],
+  "author": {
+    "name": "Handzone"
+  },
+  "dependencies": {
+    "com.unity.nuget.newtonsoft-json": "3.2.1"
+  }
+}
+
