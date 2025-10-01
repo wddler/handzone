@@ -67,10 +67,12 @@ export class RobotManager extends (EventEmitter as new () => ManagerEmitter) {
 			throw new Error('Found container without slot label')
 		}
 
-		// Virtual robots always expose 30003 internally (the host port mapping varies by slot)
 		// When connecting from within Docker, we use the internal port, not the host-mapped port
-		const port = 30003
-		const vnc = 5900
+		const internalPort = 30003
+		const internalVnc = 5900
+		let port = internalPort
+		let vnc = internalVnc
+		const slotSuffix = slot.toString().padStart(2, '0')
 
 		// Get the IP address from the container's network settings
 		// When the server runs in Docker, it needs to connect via the container's IP on the shared network
@@ -101,6 +103,8 @@ export class RobotManager extends (EventEmitter as new () => ManagerEmitter) {
 				logger.info(`Using IP from network ${firstNetwork}: ${address}`)
 			} else {
 				logger.warn(`Could not find IP for network ${networkName}, falling back to ${address}`)
+				port = Number(`3${slotSuffix}03`) // fallback to host-mapped port
+				vnc = Number(`59${slotSuffix}`)
 			}
 		}
 
