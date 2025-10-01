@@ -3,6 +3,7 @@
 import * as path from 'path'
 import { glob } from 'glob'
 import { writeFileSync, mkdirSync } from 'fs'
+import * as crypto from 'crypto'
 import {
 	quicktype,
 	InputData,
@@ -10,6 +11,26 @@ import {
 	FetchingJSONSchemaStore,
 } from 'quicktype-core'
 import * as TSJ from 'ts-json-schema-generator'
+
+// Generate Unity meta file for a C# script
+function generateUnityMetaFile(filePath: string): string {
+	// Unity uses a GUID based on the file path
+	// We'll generate a consistent GUID from the file path
+	const guid = crypto.createHash('md5').update(filePath).digest('hex').substring(0, 32)
+	
+	return `fileFormatVersion: 2
+guid: ${guid}
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+`
+}
 
 async function exportCSharp(namespace: string, inputData: InputData) {
 	return await quicktype({
@@ -52,7 +73,7 @@ async function main() {
 	const files = await new Promise<string[]>(resolve => glob(__dirname + '/src/**/*.ts', (_, matches) => resolve(matches)))
 
 	// iterate over all schema files
-	files.forEach(async (file) => {
+	for (const file of files) {
 		const namespace = 'Schema.' + path.dirname(file.replace(__dirname + '/src', '').replace(/^\/+/g, '')).replace(/\/|\\/g, '.')
 		const name = path.basename(file).replace('.ts', '')
 
@@ -77,14 +98,22 @@ async function main() {
             targetDir = path.join(outCsRoot, rel)
         }
         mkdirSync(targetDir, { recursive: true })
-        writeFileSync(path.join(targetDir, `${name}.cs`), csharp.join('\n'))
+        const csFilePath = path.join(targetDir, `${name}.cs`)
+        writeFileSync(csFilePath, csharp.join('\n'))
+        
+        // Generate Unity .meta file if outputting to Unity package
+        if (outCsRoot) {
+            const metaContent = generateUnityMetaFile(csFilePath)
+            writeFileSync(`${csFilePath}.meta`, metaContent)
+            console.log('  Generated .meta file')
+        }
 
 		/*
 		// generate c++
 		const { lines: cpp } = await exportCPlusPlus(`${namespace}.${name}`, inputData)
 		writeFileSync(path.join(path.dirname(file), `${name}.h`), cpp.join('\n'))
 		*/
-	})
+	}
 }
 
 main()

@@ -12,4 +12,7 @@ dist/
 *.njsproj
 *.sln
 *.sw?
+
+# Ignore meta files except in unity package
 *.meta
+!unity/**/*.meta
