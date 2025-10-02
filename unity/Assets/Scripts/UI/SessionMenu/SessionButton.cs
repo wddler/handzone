@@ -32,7 +32,7 @@ using UnityEngine.UI;
 public class SessionButton : MonoBehaviour
 {
     private Button _button;
-    private string _sessionAddress;
+    private string _sessionName;
     private Color _originalColor;
 
     /// <summary>
@@ -63,10 +63,10 @@ public class SessionButton : MonoBehaviour
     {
         // The server expects to join by session name, not by address.
         // Store and display the session name here to avoid mismatches.
-        _sessionAddress = session.Name;
+        _sessionName = session.Name;
 
         // Set button text to session name
-        transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = _sessionAddress;
+        transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = _sessionName;
     }
 
     /// <summary>
