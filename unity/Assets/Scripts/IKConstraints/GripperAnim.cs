@@ -32,10 +32,13 @@ using UnityEngine;
 /// the gripping state of the robotic arm.
 /// </summary>
 [RequireComponent(typeof(Animator))]
+[RequireComponent(typeof(Gripper))]
 public class GripperAnim : MonoBehaviour
 {
     private Animator _animController;
     private Gripper _gripper;
+    private bool _hasGrippingParam;
+    private bool _warnedMissingGrippingParam;
 
     /// <summary>
     /// Initializes the animator and gripper components, and sets up event listeners
@@ -46,7 +49,13 @@ public class GripperAnim : MonoBehaviour
         _animController = GetComponent<Animator>();
 
         _gripper = GetComponent<Gripper>();
-        _gripper.SetAnchorPosition(new Vector3(0, 0, -1.453f));
+        if (_gripper != null)
+        {
+            _gripper.SetAnchorPosition(new Vector3(0, 0, -1.453f));
+        }
+
+        // Cache whether the animator has the expected bool parameter
+        _hasGrippingParam = HasBoolParameter(_animController, "Gripping");
 
         if (SessionClient.Instance == null)
         {
@@ -63,6 +72,7 @@ public class GripperAnim : MonoBehaviour
     /// <param name="obj">The RealtimeDataOut object containing digital output data.</param>
     private void SetGripperAnim(RealtimeDataOut obj)
     {
+        if (obj == null) return;
         SetGripperAnim(Convert.ToBoolean(obj.DigitalOutputs));
     }
 
@@ -73,11 +83,33 @@ public class GripperAnim : MonoBehaviour
     /// <param name="state">True to grip, false to ungrip.</param>
     private void SetGripperAnim(bool state)
     {
-        _animController.SetBool("Gripping", !state);
+        if (_hasGrippingParam)
+        {
+            _animController.SetBool("Gripping", !state);
+        }
+        else if (!_warnedMissingGrippingParam)
+        {
+            Debug.LogWarning("Animator missing 'Gripping' bool parameter on " + gameObject.name);
+            _warnedMissingGrippingParam = true;
+        }
+
+        if (_gripper == null)
+            return;
 
         if (state == true)
             _gripper.Grab();
         else
             _gripper.UnGrab();
+    }
+
+    private bool HasBoolParameter(Animator anim, string parameterName)
+    {
+        if (anim == null) return false;
+        foreach (var p in anim.parameters)
+        {
+            if (p.type == AnimatorControllerParameterType.Bool && p.name == parameterName)
+                return true;
+        }
+        return false;
     }
 }

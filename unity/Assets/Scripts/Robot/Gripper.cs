@@ -34,6 +34,8 @@ public class Gripper : MonoBehaviour
     private bool _isGrabbing;
     private GameObject _attachAnchor;
     private bool _previousKinematicSetting;
+    private bool _warnedNoGrabbedListener;
+    private bool _warnedNoUngrabbedListener;
 
     /// <summary>
     /// Initializes the Gripper by creating an attachment anchor and setting up event listeners
@@ -90,7 +92,15 @@ public class Gripper : MonoBehaviour
 
         if (currentGrabbedObject)
         {
-            RobotActions.OnToolUngrabbed(currentGrabbedObject);
+            if (RobotActions.OnToolUngrabbed != null)
+            {
+                RobotActions.OnToolUngrabbed?.Invoke(currentGrabbedObject);
+            }
+            else if (!_warnedNoUngrabbedListener)
+            {
+                Debug.LogWarning("No listeners attached to RobotActions.OnToolUngrabbed.");
+                _warnedNoUngrabbedListener = true;
+            }
             currentGrabbedObject = null;
         }
     }
@@ -103,7 +113,15 @@ public class Gripper : MonoBehaviour
         if (grabbableObject)
         {
             currentGrabbedObject = grabbableObject;
-            RobotActions.OnToolGrabbed(currentGrabbedObject);
+            if (RobotActions.OnToolGrabbed != null)
+            {
+                RobotActions.OnToolGrabbed?.Invoke(currentGrabbedObject);
+            }
+            else if (!_warnedNoGrabbedListener)
+            {
+                Debug.LogWarning("No listeners attached to RobotActions.OnToolGrabbed.");
+                _warnedNoGrabbedListener = true;
+            }
 
             grabbableObject = null;
             _isGrabbing = true;
@@ -116,8 +134,9 @@ public class Gripper : MonoBehaviour
     /// </summary>
     private void Update()
     {
-        if (_isGrabbing)
-            currentGrabbedObject.transform.SetPositionAndRotation(_attachAnchor.transform.position,
+        if (_isGrabbing && currentGrabbedObject != null)
+            currentGrabbedObject.transform.SetPositionAndRotation(
+                _attachAnchor.transform.position,
                 _attachAnchor.transform.rotation);
     }
 
@@ -130,3 +149,4 @@ public class Gripper : MonoBehaviour
         _attachAnchor.transform.localPosition = position;
     }
 }
+
