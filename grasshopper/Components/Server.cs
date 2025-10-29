@@ -42,7 +42,6 @@ namespace Handzone.Components
             State.GlobalConnection.OnStatus += message =>
             {
                 _status = message;
-                Console.WriteLine(message);
 
                 ExpireSolution(true);
                 Rhino.RhinoApp.InvokeOnUiThread((Action)delegate { OnDisplayExpired(true); });
@@ -51,7 +50,6 @@ namespace Handzone.Components
             State.GlobalConnection.OnError += message =>
             {
                 _status = message;
-                Console.WriteLine(message);
 
                 ExpireSolution(true);
 
@@ -128,11 +126,11 @@ namespace Handzone.Components
             m_attributes = _button;
         }
 
-        void Connect()
+        async void Connect()
         {
             if (_pin != null)
             {
-                State.GlobalConnection.TryConnectToGlobalServer(_pin);
+                await State.GlobalConnection.TryConnectToGlobalServer(_pin);
             }
             else
             {
@@ -141,9 +139,9 @@ namespace Handzone.Components
 
         }
 
-        void Disconnect()
+        async void Disconnect()
         {
-            State.GlobalConnection.Disconnect();
+            await State.GlobalConnection.Disconnect();
         }
 
         /// <summary>
