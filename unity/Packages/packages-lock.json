@@ -8,13 +8,13 @@
       "hash": "a7c6b49a0141a5bff9b1983e38137522ef61977d"
     },
     "com.handzone.schema": {
-      "version": "https://github.com/newmedia-centre/handzone.git?path=schema/unity/com.handzone.schema",
+      "version": "https://github.com/newmedia-centre/handzone.git?path=schema/unity/com.handzone.schema#dev",
       "depth": 0,
       "source": "git",
       "dependencies": {
         "com.unity.nuget.newtonsoft-json": "3.2.1"
       },
-      "hash": "f7d6d19381a2c5319120b7141d500888ae5d8287"
+      "hash": "0b8f3a30e5fa84fe7ce7b2051e0e78cf3a42a391"
     },
     "com.meta.xr.simulator": {
       "version": "78.0.0",
