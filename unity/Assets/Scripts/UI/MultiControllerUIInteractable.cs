@@ -135,6 +135,9 @@ public class MultiControllerUIInteractable : XRBaseInteractable
         
         /// <summary>Whether this controller is currently active for UI interaction.</summary>
         public bool isActive;
+        
+        /// <summary>The last valid hit normal for cursor orientation.</summary>
+        public Vector3 lastHitNormal;
     }
     
     /// <summary>
@@ -240,10 +243,15 @@ public class MultiControllerUIInteractable : XRBaseInteractable
                 interactorData[rayInteractor] = data;
             }
             
-            // If no active controller or enough time has passed since last switch, make this the active one
-            if (activeController == null || 
-                (Time.time - lastControllerSwitchTime > controllerSwitchDelay && 
-                 rayInteractor.isSelectActive)) // Only switch if selecting
+            // If no active controller, make this the active one
+            // Or if this controller is selecting, it takes priority
+            if (activeController == null || rayInteractor.isSelectActive)
+            {
+                SetActiveController(rayInteractor);
+            }
+            // If the current active controller is not hovering anymore, switch to this one
+            else if (activeController != null && 
+                     (!interactorData.TryGetValue(activeController, out var activeData) || !activeData.hasValidTarget))
             {
                 SetActiveController(rayInteractor);
             }
@@ -457,6 +465,7 @@ public class MultiControllerUIInteractable : XRBaseInteractable
     private void ProcessInteractor(XRRayInteractor rayInteractor, InteractorData data)
     {
         bool validHitThisFrame = false;
+        Vector3 hitNormal = Vector3.forward;
         
         if (rayInteractor.TryGetCurrent3DRaycastHit(out var hit))
         {
@@ -466,9 +475,12 @@ public class MultiControllerUIInteractable : XRBaseInteractable
                 validHitThisFrame = true;
                 data.lastValidHitTime = Time.time;
                 data.targetPosition = hit.point;
+                data.lastHitNormal = hit.normal;
                 data.hasValidTarget = true;
+                hitNormal = hit.normal;
                 
-                // If this is the active controller, update the panel position
+                // Only update panel position if this is the active controller
+                // This prevents race conditions where inactive controllers overwrite the active position
                 if (rayInteractor == activeController)
                 {
                     // Convert texture coordinates to panel space for validation
@@ -487,6 +499,12 @@ public class MultiControllerUIInteractable : XRBaseInteractable
                     }
                 }
             }
+        }
+        
+        // If we didn't have a valid hit but had one recently, mark as no longer valid
+        if (!validHitThisFrame && Time.time - data.lastValidHitTime > 0.1f)
+        {
+            data.hasValidTarget = false;
         }
         
         // Handle cursor visibility and position
@@ -508,11 +526,8 @@ public class MultiControllerUIInteractable : XRBaseInteractable
                     positionSmoothTime
                 );
                 
-                // Orient cursor to face the normal
-                if (validHitThisFrame)
-                {
-                    data.cursorInstance.transform.rotation = Quaternion.LookRotation(-hit.normal);
-                }
+                // Orient cursor to face the normal (use last valid normal if not valid this frame)
+                data.cursorInstance.transform.rotation = Quaternion.LookRotation(-data.lastHitNormal);
                 
                 // Update cursor color based on interaction state
                 var renderer = data.cursorInstance.GetComponentInChildren<Renderer>();
@@ -535,7 +550,7 @@ public class MultiControllerUIInteractable : XRBaseInteractable
         }
         
         // If this interactor is no longer valid and it's the active one, try to find a new active controller
-        if (!validHitThisFrame && rayInteractor == activeController && Time.time - data.lastValidHitTime > 0.2f)
+        if (!data.hasValidTarget && rayInteractor == activeController)
         {
             // Find another controller with a valid target
             XRRayInteractor newActive = null;
@@ -571,18 +586,24 @@ public class MultiControllerUIInteractable : XRBaseInteractable
         var invalidPosition = new Vector2(-10000, -10000); // Far off-screen
         
         // If no active controller, return invalid position
-        if (activeController == null || !interactorData.TryGetValue(activeController, out var data))
+        if (activeController == null)
         {
             return invalidPosition;
         }
         
-        // If the active controller has a valid panel position, return it
-        if (data.hasValidTarget)
+        // Get the active controller's data
+        if (!interactorData.TryGetValue(activeController, out var data))
         {
-            return data.lastValidPanelPosition;
+            return invalidPosition;
         }
         
-        return invalidPosition;
+        // Only return valid position if the active controller currently has a valid target
+        if (!data.hasValidTarget)
+        {
+            return invalidPosition;
+        }
+        
+        return data.lastValidPanelPosition;
     }
     
     /// <summary>

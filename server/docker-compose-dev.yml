@@ -20,10 +20,10 @@ services:
     env_file:
       - .env
     restart: always
-    ports: 
+    ports:
       - "3000:3000"
       - "4000:4000"
-      - "5900:5900"
+      - "5900:5901" # Map host port 5900 to container's VNC proxy on 5901
     container_name: handzone-dev
     environment:
       VIRTUAL_HOST: ${HOSTNAME}
@@ -44,11 +44,7 @@ services:
 
     # Ensure DB schema exists before starting dev server
     command: >-
-      sh -c "
-      (npx prisma generate || true) &&
-      until npx prisma migrate deploy; do echo 'Waiting for database...'; sleep 2; done &&
-      ./node_modules/.bin/tsx src/server/index.ts
-      "
+      sh -c " (npx prisma generate || true) && until npx prisma migrate deploy; do echo 'Waiting for database...'; sleep 2; done && ./node_modules/.bin/tsx src/server/index.ts "
 
 networks:
   default:

@@ -39,16 +39,16 @@ export class DockerManager extends (EventEmitter as new () => DockerEmitter) {
 		// initialize the EventEmitter
 		super()
 
-    // create the dockerode instance
-    logger.info('Connecting to docker...')
+		// create the dockerode instance
+		logger.info('Connecting to docker...')
 
-    // Prefer unix socket if available; fall back to configured options
-    const hasSocket = existsSync('/var/run/docker.sock')
-    const options = hasSocket
-      ? ({ socketPath: '/var/run/docker.sock' } as unknown)
-      : (env.DOCKER.OPTIONS as unknown)
+		// Prefer unix socket if available; fall back to configured options
+		const hasSocket = existsSync('/var/run/docker.sock')
+		const options = hasSocket
+			? ({ socketPath: '/var/run/docker.sock' } as unknown)
+			: (env.DOCKER.OPTIONS as unknown)
 
-    this.docker = new Docker(options as DockerOptions)
+		this.docker = new Docker(options as DockerOptions)
 		this.containers = new Map()
 		this._semaphore = new Sema(env.DOCKER.MAX_VIRTUAL)
 		this._slotMachine = new Set([...Array(env.DOCKER.MAX_VIRTUAL).keys()].map(x => x + 1))
@@ -98,11 +98,12 @@ export class DockerManager extends (EventEmitter as new () => DockerEmitter) {
 		}
 
 		// create container
-		logger.info('Creating virtual robot...')
+		logger.info('Creating virtual robot...', { network: env.DOCKER_NETWORK, slot })
 		const container = await this.docker.createContainer({
 			Image: 'ghcr.io/newmedia-centre/ursim_cb3:3.15.8',
 			HostConfig: {
 				RestartPolicy: { Name: 'always' },
+				NetworkMode: env.DOCKER_NETWORK,
 				PortBindings: {
 					'30001/tcp': [{ HostPort: `3${slot.toString().padStart(2, '0')}01` }],
 					'30002/tcp': [{ HostPort: `3${slot.toString().padStart(2, '0')}02` }],

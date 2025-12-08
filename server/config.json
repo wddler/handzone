@@ -15,10 +15,11 @@
 	],
 	"DOCKER": {
 		"OPTIONS": {
-			"socketPath": "/var/run/docker.sock"
+			"socketPath": "/var/run/docker.sock",
+			"host": "localhost"
 		},
 		"MAX_VIRTUAL": 5,
-		"NOTE": "To use the TCP proxy instead of the Unix socket, set DOCKER.OPTIONS to { \"host\": \"docker\", \"port\": 2375 } when the proxy runs in the same compose stack/network, or to { \"host\": \"localhost\", \"port\": 2375 } when running the server on the host while the proxy is mapped to 2375 on localhost."
+		"NOTE": "When running the server inside Docker (docker-compose-dev.yml), it uses the Unix socket to manage containers but connects to them via their IP on the shared network. The 'host' field is used as a fallback if the network IP cannot be determined. To use the TCP proxy instead of the Unix socket, set DOCKER.OPTIONS to { \"host\": \"docker\", \"port\": 2375 } when the proxy runs in the same compose stack/network, or to { \"host\": \"localhost\", \"port\": 2375 } when running the server on the host while the proxy is mapped to 2375 on localhost."
 	},
 	"OAUTH": {
 		"name": "SURFconext",
