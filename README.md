@@ -12,6 +12,8 @@ These sessions can be used to interact with robots in real-time inside a virtual
 **[Applications](#applications)** • **[Features](#features)** • **[Prerequisites](#prerequisites)** • **[Getting Started](#getting-started)** • **[Contributing](#contributing)** • **[Contact](#contact)**
 
 
+![Overview](/handzone_overview.png)
+
 ### Applications
 - **[HANDZONe Server](server/README.md)**: The backend server for the HANDZONe project.
 - **[HANDZONe Virtual Reality application](unity/README.md)**: The VR app for the HANDZONe project.
